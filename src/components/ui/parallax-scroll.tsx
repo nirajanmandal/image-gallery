@@ -31,12 +31,12 @@ export const ParallaxScroll = ({
   const translateSecond = useTransform(scrollYProgress, [0, 1], [0, 200]);
   const translateThird = useTransform(scrollYProgress, [0, 1], [0, -200]);
 
-  const third = Math.ceil(images.length / 3);
+  const third = Math.floor(images.length / 3);
+  const remainder = images.length % 3;
 
-  const firstPart = images.slice(0, third);
-  const secondPart = images.slice(third, 2 * third);
-  const thirdPart = images.slice(2 * third);
-
+  const firstPart = images.slice(0, third + (remainder > 0 ? 1 : 0));
+  const secondPart = images.slice(firstPart.length, firstPart.length + third + (remainder > 1 ? 1 : 0));
+  const thirdPart = images.slice(firstPart.length + secondPart.length);
 
   const handlePrevious = () => {
     if (currentPage > 1 && !isLoading) {
@@ -52,38 +52,47 @@ export const ParallaxScroll = ({
 
   return (
     <div
-      className={cn("h-screen items-start w-full", className)}
+      className={cn("md:h-[calc(100vh-6rem)] h-[calc(100vh-10rem)] items-start overflow-y-auto w-full hide-scrollbar mt-16", className)}
       ref={gridRef}
     >
       <div
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-start max-w-full mx-auto gap-10 py-10 px-40"
+        className="grid grid-cols-2 lg:grid-cols-3 items-start max-w-full mx-auto gap-10 pt-10 px-10 md:px-40"
         ref={gridRef}
       >
-        <div className="grid gap-10 justify-items-center ">
+        <div className="grid gap-10">
           {firstPart.map((el, idx) => (
             <motion.div
               style={{ y: translateFirst }} // Apply the translateY motion value here
               key={"grid-1" + idx}
             >
-              <DirectionAwareHover imageUrl={el.download_url}>
+              <DirectionAwareHover
+                className="md:h-80 md:w-80 h-40 w-40 shadow-[0px_8px_15px_0px_#4a5568]"
+                imageUrl={el.download_url}
+              >
                 <p className="font-bold text-xl">{el.author}</p>
               </DirectionAwareHover>
             </motion.div>
           ))}
         </div>
-        <div className="grid gap-10 justify-items-center">
+        <div className="grid gap-10 ">
           {secondPart.map((el, idx) => (
             <motion.div style={{ y: translateSecond }} key={"grid-2" + idx}>
-              <DirectionAwareHover imageUrl={el.download_url}>
+              <DirectionAwareHover
+                className="md:h-80 md:w-80 h-40 w-40 shadow-[0px_8px_15px_0px_#4a5568]"
+                imageUrl={el.download_url}
+              >
                 <p className="font-bold text-xl">{el.author}</p>
               </DirectionAwareHover>
             </motion.div>
           ))}
         </div>
-        <div className="grid gap-10 justify-items-center">
+        <div className="grid gap-10">
           {thirdPart.map((el, idx) => (
             <motion.div style={{ y: translateThird }} key={"grid-3" + idx}>
-              <DirectionAwareHover imageUrl={el.download_url}>
+              <DirectionAwareHover
+                className="md:h-80 md:w-80 h-40 w-40 shadow-[0px_8px_15px_0px_#4a5568]"
+                imageUrl={el.download_url}
+              >
                 <p className="font-bold text-xl">{el.author}</p>
               </DirectionAwareHover>
             </motion.div>
@@ -97,7 +106,6 @@ export const ParallaxScroll = ({
           Icon={ArrowLeftIcon}
           iconPlacement="left"
           onClick={handlePrevious}
-          loading={isLoading}
           disabled={currentPage === 1 || isLoading}>
           Previous
         </Button>
@@ -107,7 +115,6 @@ export const ParallaxScroll = ({
           Icon={ArrowRightIcon}
           iconPlacement="right"
           onClick={handleNext}
-          loading={isLoading}
           disabled={isLoading}>
           Next
         </Button>
